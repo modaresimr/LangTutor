@@ -1,0 +1,9 @@
+Quart
+PyYAML~=6.0
+openai~=1.12.0
+langcodes~=3.3.0
+language_data~=1.1
+unidecode~=1.3.6
+pydub~=0.25.1
+#gtts
+asyncgTTS
