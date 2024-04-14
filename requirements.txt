@@ -9,3 +9,4 @@ gtts
 #asyncgTTS
 aiohttp
 asyncio
+litellm

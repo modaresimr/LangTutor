@@ -3,6 +3,7 @@ from typing import Generator
 from .memory import Memory
 from .config import Config
 from .language import iso6391_to_language_name
+from litellm import acompletion
 
 SYSTEM_PROMPT = """You are a {language} teacher named {teacher_name}. You are on a 1-on-1 
                    session with your  student, {user_name}. {user_name}'s {language} level 
@@ -29,8 +30,7 @@ Je <change>te aime<reason>t'aime: describe more about the error</reason></change
 <change>ma amie<reason>mon amie : même cette <i>amie</i> est féminine et comme elle commence par un elle nécessite <i>mon</i>. donc ma amie a tort</reason></change>
 
 
-Skip the preamble. 
-
+always Skip the preamble. only response the result. do not say Voici.
 """
 
 
@@ -65,23 +65,24 @@ class Chatbot:
             teacher_name=config.bot.name, user_name=config.user.name, language=lang, user_language=user_lang,
             level=config.language.level, user_gender=config.user.gender, bot_gender=config.bot.gender
         )))
-    async def fix_grammer_issue(self, msg) -> Generator:
+    async def fix_grammer_issue(self, msg):
         history=[
-            {"role": "system", "content": GRAMMAR_INSTRUCTIONS},
+            # {"role": "system", "content": GRAMMAR_INSTRUCTIONS},
             {"role": "user", "content": msg}
             ]
          
-        response = await self.client.chat.completions.create(
-            
-            model='gpt-4-turbo',
+        response = await acompletion(
+            # model='gpt-4-turbo',
+            model='claude-3-haiku-20240307',
             temperature=self._temperature,
             # prompt=GRAMMAR_INSTRUCTIONS,
+            system=GRAMMAR_INSTRUCTIONS,
             messages=history,  # type: ignore
             stream=True
         )
         return response
 
-    async def get_response(self, is_initial_message=False) -> Generator:
+    async def get_response(self, is_initial_message=False) :
         """
         send previous messages (stored in `self._memory`) to GPT and receive a response.
         The response is streamed, therefore a Generator is returned
@@ -99,8 +100,9 @@ class Chatbot:
                 language=iso6391_to_language_name(self._language))
             )
 
-        response = await self.client.chat.completions.create(
+        response = await acompletion(
             model=self._model,
+            # model='claude-3-haiku-20240307',
             temperature=self._temperature,
             messages=history,  # type: ignore
             stream=True

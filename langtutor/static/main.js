@@ -75,6 +75,7 @@ function send(message) {
 
 var myid=1
 function addMyMessage(message){
+  htmlmsg['user']=''
   addMessage('user', 'user'+myid, message)
   myid+=1
 }

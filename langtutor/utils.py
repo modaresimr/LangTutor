@@ -1,6 +1,7 @@
 import re
 import os
-from openai import AsyncOpenAI
+# from openai import AsyncOpenAI
+from litellm import acompletion
 
 from pydub import AudioSegment
 from typing import List, Optional
@@ -68,7 +69,7 @@ def bot_text_to_speech(text: str, message_index: int, counter: int) -> str:
     return filename
 
 
-def init_openai(config: Config) -> AsyncOpenAI:
+def init_openai(config: Config) -> acompletion:
     """
     Initialize OpenAI configurations from Config
 
@@ -80,7 +81,7 @@ def init_openai(config: Config) -> AsyncOpenAI:
     else:
         api_key=os.getenv("OPENAI_API_KEY")
         
-    return AsyncOpenAI(api_key=api_key)
+    return 
 
 
 
