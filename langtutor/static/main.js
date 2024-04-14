@@ -71,6 +71,7 @@ function send(message) {
   return false;
 }
 
+var myid=1
 function addMyMessage(txt){
   addMessage('user', 'user'+myid, message)
   myid+=1
@@ -90,7 +91,7 @@ $(document).ready(function () {
     autoResize(this);
   });
   autoResize(textarea);
-  var myid=1
+  
   $('#message-form').on('submit', function (e) {
     e.preventDefault();
     var message = $('#message-input').val();
