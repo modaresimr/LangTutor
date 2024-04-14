@@ -402,7 +402,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
   if (message == "") {
     analysedText += "\n"
   }
-    htmlMessage = message.replace(/\n/g, "<br>");
+    htmlMessage = message//.replace(/\n/g, "<br>");
     htmlmsg[sender]+=htmlMessage
     message_body.html(htmlmsg[sender]);
     if (sender == 'assistant') {
