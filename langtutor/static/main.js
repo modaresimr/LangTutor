@@ -21,6 +21,7 @@ function startMessageWS() {
     var end = response['end']
     if (end) {
       speak(" ", true)
+     
     }
 
 
@@ -36,6 +37,7 @@ function startMessageWS() {
     addMessage(user, index, message, has_user_recording, is_language_learning);
     if (end) {
       analysedText = ""
+      htmlmsg[user]=''
     }
   });
 
@@ -320,8 +322,14 @@ $(document).ready(function () {
 });
 
 var analysedText = ""
+
+htmlmsg={'assistant':'','user':'','corrector':''}
 function addMessage(sender, message_id, message, has_user_recording, is_language_learning, do_not_store, end) {
-  message_body = $("#message_" + message_id)
+  if (end || sender=='user'){
+    htmlmsg[sender]=''
+  }
+  tagid='message_'+sender + message_id
+  message_body = $("#"+tagid)
 
   var message_box = $('#message-box');
   if (message_body.length == 0) {
@@ -329,14 +337,17 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
     var message_col = $('<div class="col d-flex align-items-start"></div>');  // Changed to d-flex and align-items-start
     var message_card = $('<div class="card flex-grow-1"></div>');
     // var message_body = $('<div class="card-body"></div>');
-    var message_body = $('<div class="card-body" id="message_' + message_id + '"></div>');
+    var message_body = $('<div class="card-body" id="'+tagid+'"></div>');
 
-    message_body.id = "message_" + message_id;
+    message_body.id = tagid;
 
 
     if (sender === 'user') {
       message_card.addClass('bg-primary text-white');
       var img = $('<img src="' + user_profile_img + '" class="profile-pic rounded-circle mr-3" width="50" height="50">');  // Replace path_to_user_image with the actual path
+    } else if (sender ==='corrector'){
+        message_card.addClass('bg-success text-white');
+        var img = $('<img src="' + user_profile_img + '" class="profile-pic rounded-circle mr-3" width="50" height="50">');  // Replace path_to_user_image with the actual path
     } else {
       message_card.addClass('bg-light');
       var img = $('<img src="' + bot_profile_img + '" class="profile-pic rounded-circle mr-3" width="50" height="50">');  // Replace path_to_bot_image with the actual path
@@ -382,6 +393,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
       sound_on_button.on('click', function () {
         stopPlaying = false;
         // $.post('/play_bot_recording', {'message_id': message_body.id, 'text': message_body.text(), 'play_existing': 1}, function (response) {});
+        stopAudio()
         requestAudio({ 'message_id': message_body.id, 'message': message_body.text(), 'play_existing': 1 })
       });
     }
@@ -391,9 +403,9 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
     analysedText += "\n"
   }
     htmlMessage = message.replace(/\n/g, "<br>");
-
-    message_body.html(message_body.html() + htmlMessage);
-    if (sender != 'user') {
+    htmlmsg[sender]+=htmlMessage
+    message_body.html(htmlmsg[sender]);
+    if (sender == 'assistant') {
       analysedText += message
       
       var regex = /(.*[.\n!?])(.*)/;
@@ -503,7 +515,7 @@ function loadPastMessages(messages) {
     var msg = messages[i];
     addMessage(msg.role, msg.index, msg.content, false, msg.is_language_learning, true);
   }
-  toggleLoadingIcon('hide');
+  // toggleLoadingIcon('hide');
 }
 
 function autoResize(textarea) {

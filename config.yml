@@ -11,7 +11,7 @@ language:
   native: fr
 model:
   name: gpt-3.5-turbo
-  temperature: 0.8
+  temperature: 0.3
 user:
   gender: Female
   image: ''

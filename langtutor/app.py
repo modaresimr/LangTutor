@@ -108,11 +108,14 @@ async def ws():
                 is_initial_message = bool(int(data.get('is_initial_message',0)))
                 if data.get('message'):
                     memory.add("user",data['message'],recording=True,user_recording=True)
-                    # await websocket.send_json({
-                    #     'index': len(memory),
-                    #     'user':'user',
-                    #     'message': data['message']
-                    # })
+                    
+                    async for chunk in await chatbot.fix_grammer_issue(data['message']):
+                        msg=chunk.choices[0].delta.content or ""
+                        await websocket.send_json({
+                            'index': len(memory),
+                            'user':'corrector',
+                            'message': msg
+                        })
 
                 streamResponse = await chatbot.get_response(is_initial_message)
                 memory.add("assistant","",recording=False,user_recording=False)
@@ -126,10 +129,12 @@ async def ws():
                     memory._memory[-1]['content']+=msg
                     await websocket.send_json({
                         'index': len(memory),
+                        'user':'assistant',
                         'message': msg
                     })
                 await websocket.send_json({
                         'index': len(memory),
+                        'user':'assistant',
                         'message': '',
                         'end':True
                     })
@@ -142,6 +147,7 @@ async def ws():
                 await websocket.send_json({
                     'message':  "",
                     'message_index': len(memory),
+                    'user':'assistant',
                     'error': error_message
                 })
             

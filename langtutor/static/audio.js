@@ -155,7 +155,7 @@ function startRecording() {
 
     recordButton.removeClass('btn-secondary off').addClass('btn-danger on');
     langToggleButton.removeClass('btn-secondary off').addClass('btn-danger on');
-    toggleLoadingIcon('show');
+    // toggleLoadingIcon('show');
     recognition.start();
     return
     return new Promise(async (resolve, reject) => {
@@ -196,7 +196,7 @@ function stopRecording() {
     var langToggleButton = $('#lang-toggle-button'); // Select the lang-toggle-button
     recordButton.removeClass('btn-danger on').addClass('btn-secondary off');
     langToggleButton.removeClass('btn-danger on').addClass('btn-secondary off');
-    toggleLoadingIcon('hide');
+    // toggleLoadingIcon('hide');
     // if (mediaRecorder) {
     //     mediaRecorder.stop();
     // }
@@ -326,6 +326,8 @@ var voice=undefined;
 
 var speakQ=[]
 function speak(txt,end) {
+    $('#tmp').html(txt)
+    txt=$('#tmp').text()
     if (voice==undefined){
         voices = synth.getVoices()
         for (let i = 0; i < voices.length; i++) {
@@ -360,7 +362,7 @@ function speak(txt,end) {
         console.log("SpeechSynthesisUtterance.onerror");
       };
       utterThis.voice=voice;
-          
+      utterThis.lang = "fr-FR";
       utterThis.pitch = 1;
       utterThis.rate = 1;
       synth.speak(utterThis);

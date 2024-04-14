@@ -196,3 +196,62 @@ img.profile-pic {
     height: 35px;
   }
 }
+
+
+.off img{
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+change {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+change reason {
+  visibility: hidden;
+  /* min-width: 120px; */
+  width: 70vw;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+change reason::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+change:hover reason {
+  visibility: visible;
+  opacity: 1;
+}
+change:focus reason {
+  visibility: visible;
+  opacity: 1;
+}

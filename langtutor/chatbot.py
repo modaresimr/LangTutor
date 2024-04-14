@@ -9,25 +9,45 @@ SYSTEM_PROMPT = """You are a {language} teacher named {teacher_name}. You are on
                    is: {level}. Your task is to assist your student in advancing their {language}.
                    * When the session begins, offer a suitable session for {user_name}, unless asked for 
                    something else.
-                   * IMPORTANT: If your student makes any mistake, be it typo or grammar, you MUST first correct
-                   your student and only then reply.
-                   * IMPORTANT: talk less the student IQ is high so never repeat. 
-                   * You are only allowed to speak {language}."""
+                   * IMPORTANT: Minimal response with only few words. the student IQ is high so never repeat. 
+                   * You are only allowed to speak {language}.
+                   * use html5 tags add bullet, bold, italic, header whenever is useful"""
 
-INITIAL_MESSAGE = """Greet me, and then suggest 3 optional subjects for our lesson suiting my level. 
-                     You must reply in {language}."""
+GRAMMAR_INSTRUCTIONS="""
+Your task is to take the text provided and make it grammatically, typo correct version while preserving the original text as closely as possible. Correct any spelling mistakes, punctuation errors, verb tense issues, word choice problems, and other grammatical mistakes.
+
+for all correct part echo them directly  but for all errors, you have to wrap the part in change tag and inside the change tag a reason tag
+<change>
+changed part
+<reason>describe why the change is needed in french</reason>
+</change>
+
+for example for:
+Je te aime ma amie
+should replay:
+Je <change>te aime<reason>t'aime: describe more about the error</reason></change> 
+<change>ma amie<reason>mon amie : même cette <i>amie</i> est féminine et comme elle commence par un elle nécessite <i>mon</i>. donc ma amie a tort</reason></change>
+
+
+Skip the preamble. 
+
+"""
+
 
 TUTOR_INSTRUCTIONS = """
                      ---
                      IMPORTANT: 
-                     * If I replied in {language} and made any mistakes (grammar, typos, etc), you must correct me 
-                     before replying
                      * You must keep the session flow, you're response cannot end the session. Try to avoid broad
                      questions like "what would you like to do", and prefer to provide me with related questions
                      and exercises. 
-                     * You MUST reply in {language}.
+                     * You MUST reply in {language}. 
+                     * Minimal response with only few words.
+                     * reply with html5 bullet, bold, italic, header whenever is useful
+                     * no markdown only html5
                      """
 
+INITIAL_MESSAGE = """Greet me, and  for each category of grammar, vocab, understanding, speaking  then suggest 3 random optional subjects foreach category in suiting my level. 
+""" +TUTOR_INSTRUCTIONS
 
 class Chatbot:
     """
@@ -45,6 +65,21 @@ class Chatbot:
             teacher_name=config.bot.name, user_name=config.user.name, language=lang, user_language=user_lang,
             level=config.language.level, user_gender=config.user.gender, bot_gender=config.bot.gender
         )))
+    async def fix_grammer_issue(self, msg) -> Generator:
+        history=[
+            {"role": "system", "content": GRAMMAR_INSTRUCTIONS},
+            {"role": "user", "content": msg}
+            ]
+         
+        response = await self.client.chat.completions.create(
+            
+            model='gpt-4-turbo',
+            temperature=self._temperature,
+            # prompt=GRAMMAR_INSTRUCTIONS,
+            messages=history,  # type: ignore
+            stream=True
+        )
+        return response
 
     async def get_response(self, is_initial_message=False) -> Generator:
         """
