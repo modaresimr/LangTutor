@@ -6,7 +6,9 @@ RUN apk update && \
     apk add --no-cache \
     ffmpeg \
     git \
-    build-base 
+    build-base \
+    libffi-dev
+
 # Clone the companion repository
 RUN git clone https://github.com/modaresimr/langtutor.git /app
 
