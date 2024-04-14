@@ -72,7 +72,7 @@ function send(message) {
 }
 
 var myid=1
-function addMyMessage(txt){
+function addMyMessage(message){
   addMessage('user', 'user'+myid, message)
   myid+=1
 }
