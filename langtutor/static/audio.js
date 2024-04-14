@@ -302,7 +302,7 @@ recognition.onresult = function(event) {
 
   if (isFinal) {
     console.log('Finalized speech:', transcript);
-    addMessage('user','-1',transcript)
+    addMyMessage(transcript)
     $('#message-input').val('');
     stopRecording()
     // User finished speaking, do something

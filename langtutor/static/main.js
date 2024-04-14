@@ -71,6 +71,11 @@ function send(message) {
   return false;
 }
 
+function addMyMessage(txt){
+  addMessage('user', 'user'+myid, message)
+  myid+=1
+}
+
 $(document).ready(function () {
   startAudioWS()
   startMessageWS()
@@ -85,14 +90,14 @@ $(document).ready(function () {
     autoResize(this);
   });
   autoResize(textarea);
-
+  var myid=1
   $('#message-form').on('submit', function (e) {
     e.preventDefault();
     var message = $('#message-input').val();
     if (message.trim() !== '') {
       $('#message-input').val('');
       // send({'message': message})
-      addMessage('user', '-1', message)
+      addMyMessage(message)
     }
   });
 
@@ -380,15 +385,16 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
       });
     }
   }
-  if (message) {
+  
+  if (message == "") {
+    analysedText += "\n"
+  }
     htmlMessage = message.replace(/\n/g, "<br>");
 
     message_body.html(message_body.html() + htmlMessage);
     if (sender != 'user') {
       analysedText += message
-      if (message == "") {
-        analysedText += "\n"
-      }
+      
       var regex = /(.*[.\n!?])(.*)/;
       var match = analysedText.match(regex);
 
@@ -402,7 +408,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
     } else {
       analysedText = ""
     }
-  }
+  
   message_box.scrollTop(message_box.prop('scrollHeight'));
 
   // var translated_message = false;
@@ -425,7 +431,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
   // message_box.append(message_row);
   message_box.scrollTop(message_box.prop('scrollHeight'));
 
-  if (sender === 'user' && !do_not_store) {
+  if (sender === 'user') {
     // $.post('/store_message', {'sender': sender, 'message': message}, function (response) {});
     send({ 'sender': sender, 'message': message })
   }
