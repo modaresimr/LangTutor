@@ -410,7 +410,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
       analysedText = ""
     }
   
-  message_box.scrollTop(message_box.prop('scrollHeight'));
+  message_box.scrollTop(message_box.prop('scrollHeight')+message_box.height());
 
   // var translated_message = false;
   // if (translate_button !== null) {
@@ -430,7 +430,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
 
 
   // message_box.append(message_row);
-  message_box.scrollTop(message_box.prop('scrollHeight'));
+  // message_box.scrollTop(message_box.prop('scrollHeight'));
 
   if (sender === 'user') {
     // $.post('/store_message', {'sender': sender, 'message': message}, function (response) {});
