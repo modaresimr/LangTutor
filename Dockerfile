@@ -5,7 +5,8 @@ FROM python:3.12-alpine
 RUN apk update && \
     apk add --no-cache \
     ffmpeg \
-    git 
+    git \
+    build-base 
 # Clone the companion repository
 RUN git clone https://github.com/modaresimr/langtutor.git /app
 
