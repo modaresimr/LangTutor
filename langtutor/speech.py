@@ -1,18 +1,14 @@
 from openai import OpenAI
 from typing import Dict, List, Optional
-from google.oauth2.service_account import Credentials
-from google.cloud import texttospeech
+
 from .config import Config
 from gtts import gTTS
 
 
-t2s_audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
-t2s_client: Optional[texttospeech.TextToSpeechClient] = None
-t2s_voice: Optional[texttospeech.VoiceSelectionParams] = None
 openai_client: Optional[OpenAI] = None
 
 
-def init_speech(config: Config, credentials: Optional[Credentials]) -> None:
+def init_speech(config: Config, credentials) -> None:
     """
     Initialize Google text-to-speech client and OpenAI client
 
@@ -28,7 +24,7 @@ def init_speech(config: Config, credentials: Optional[Credentials]) -> None:
     # t2s_voice = get_voice_object(voice_name=config.bot.voice, language_code=f"{l[0]}-{l[1]}")
 
 
-def get_voice_object(voice_name: str, language_code: str) -> texttospeech.VoiceSelectionParams:
+def get_voice_object(voice_name: str, language_code: str) :
     """
     Create a VoiceSelectionParams object
 
@@ -36,7 +32,8 @@ def get_voice_object(voice_name: str, language_code: str) -> texttospeech.VoiceS
     :param language_code: language code and locale (i.e. 'en-US')
     :return: a VoiceSelectionParams object
     """
-    return texttospeech.VoiceSelectionParams(name=voice_name, language_code=language_code)
+    return
+    # return texttospeech.VoiceSelectionParams(name=voice_name, language_code=language_code)
 
 
 def speech2text(filename: str, language: str) -> str:
@@ -56,7 +53,7 @@ def speech2text(filename: str, language: str) -> str:
     return transcript
 
 
-def text2speech(text: str, filename: str, voice: Optional[texttospeech.VoiceSelectionParams] = None) -> str:
+def text2speech(text: str, filename: str, voice = None) -> str:
     """
     Convert text to speech
 
