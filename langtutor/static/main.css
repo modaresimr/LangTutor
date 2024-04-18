@@ -210,12 +210,15 @@ img.profile-pic {
 
 
 
-
+.corrector{
+    margin: -20px 0 1rem !important;
+}
 
 change {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black;
+  color:red
 }
 
 change reason {

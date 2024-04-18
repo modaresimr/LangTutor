@@ -283,6 +283,7 @@ function updateUIByAudioStatus(is_playing) {
 // Initialize Web Speech API recognition with French language
 const recognition = new webkitSpeechRecognition();
 recognition.lang = 'fr-FR'; // Set language to French
+recognition.continuous=true;
 recognition.interimResults = true; // Enable interim results for capturing real-time speech
 
 // Set up event handlers
@@ -290,21 +291,44 @@ recognition.onstart = function() {
   console.log('Speech recognition started');
 };
 
-recognition.onend = function() {
-  console.log('Speech recognition ended');
+recognition.onsoundend = function() {
+  console.log('Speech recognition sound ended');
+
+//   recognition.start()
 };
 
+recognition.onend = function() {
+    console.log('Speech recognition ended');
+  
+    // recognition.start()
+  };
+
+var audio2send=""
+var lastAudioBounce=-1
+function sendBounce(){
+    addMyMessage(audio2send)
+    audio2send=""
+    stopRecording()
+}
 recognition.onresult = function(event) {
   // Handle speech recognition results
+//   if (audio2send==""){
+//     audio2send=$('#message-input').val();
+//   }
   const result = event.results[event.results.length - 1];
   const isFinal = result.isFinal;
   const transcript = result[0].transcript;
-
+  clearTimeout(lastAudioBounce)
   if (isFinal) {
     console.log('Finalized speech:', transcript);
-    addMyMessage(transcript)
+    audio2send+=transcript+". "
+
+    lastAudioBounce=setTimeout(sendBounce,3000)
+
+    
+
     $('#message-input').val('');
-    stopRecording()
+    
     // User finished speaking, do something
   } else {
     console.log('Interim speech:', transcript);
@@ -326,6 +350,8 @@ var voice=undefined;
 
 var speakQ=[]
 function speak(txt,end) {
+    if (!$("#record-button").hasClass("off"))
+        return
     $('#tmp').html(txt)
     txt=$('#tmp').text()
     if (voice==undefined){

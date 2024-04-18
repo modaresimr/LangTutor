@@ -83,6 +83,14 @@ function addMyMessage(message){
 $(document).ready(function () {
   startAudioWS()
   startMessageWS()
+  $(document).on('mouseenter', '[title]', function() {
+    $(this).tooltip({ html: true }).tooltip('show');
+  });
+
+  // Hide tooltips on mouseout
+  $(document).on('mouseleave', '[title]', function() {
+    $(this).tooltip('hide');
+  });
   var currentLanguageIndex = 0;
 
   // Check if the user's system prefers dark mode
@@ -333,8 +341,9 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
   message_body = $("#"+tagid)
 
   var message_box = $('#message-box');
+  
   if (message_body.length == 0) {
-    var message_row = $('<div class="row mb-3"></div>');
+    var message_row = $(`<div class="row mb-3 ${sender}"></div>`);
     var message_col = $('<div class="col d-flex align-items-start"></div>');  // Changed to d-flex and align-items-start
     var message_card = $('<div class="card flex-grow-1"></div>');
     // var message_body = $('<div class="card-body"></div>');
@@ -422,7 +431,7 @@ function addMessage(sender, message_id, message, has_user_recording, is_language
     } else {
       analysedText = ""
     }
-  
+    
   message_box.scrollTop(message_box.prop('scrollHeight')+message_box.height());
 
   // var translated_message = false;
@@ -459,40 +468,6 @@ function toggleLoadingIcon(action) {
   }
 }
 
-
-// function getResponse(is_initial_message) {
-//   toggleLoadingIcon('show');
-//   stopPlaying = false;
-
-//   send({'is_initial_message': is_initial_message})
-//   // $.post('/get_response', {'is_initial_message': is_initial_message}, function(response) {
-
-//   //     // getNextMessage(message_index);
-//   // });
-// }
-
-
-// function getNextMessage(message_index) {
-//     $.post('/get_next_message', {'message_index': message_index}, function(response) {
-//         var bot_message = response['message'];
-//         if (bot_message === null) {
-//             // No more messages to show
-//             toggleLoadingIcon('hide');
-//             return;
-//         }
-//         bot_message = bot_message.replace(/\n/g, "<br>");
-//         updateLastMessage(bot_message);
-//         getNextMessage(message_index)
-//     });
-// }
-
-
-// function updateLastMessage(newContent) {
-//   var message_box = $('#message-box');
-//   var last_message_row = message_box.find('.row:last');
-//   var last_message_card_body = last_message_row.find('.card-body');
-//   last_message_card_body.html(newContent);
-// }
 
 
 function setDarkMode(isDarkMode) {

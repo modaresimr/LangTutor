@@ -96,6 +96,31 @@ async def audiows():
     except asyncio.CancelledError:
         print('Client disconnected')
         raise
+
+async def sendResponse(streamResponse,memory,user):
+    if user=='assistant':
+        memory.add(user,"",recording=False,user_recording=False)
+    idx=len(memory)-1   
+    await websocket.send_json({
+                        'index': idx,
+                        'user':user,
+                        'message': ""
+                    })
+    async for chunk in await streamResponse:
+        msg=chunk.choices[0].delta.content or ""
+        if user=='assistant':
+            memory._memory[idx]['content']+=msg
+        await websocket.send_json({
+            'index': idx,
+            'user':user,
+            'message': msg
+        })
+    await websocket.send_json({
+            'index': idx,
+            'user':user,
+            'message': '',
+            'end':True
+        })
 @app.websocket('/ws')
 async def ws():
     try:
@@ -106,42 +131,14 @@ async def ws():
             data = await websocket.receive_json()
             try:
                 is_initial_message = bool(int(data.get('is_initial_message',0)))
+                tasks=[]
                 if data.get('message'):
                     memory.add("user",data['message'],recording=True,user_recording=True)
-                    
-                    async for chunk in await chatbot.fix_grammer_issue(data['message']):
-                        msg=chunk.choices[0].delta.content or ""
-                        await websocket.send_json({
-                            'index': len(memory),
-                            'user':'corrector',
-                            'message': msg
-                        })
+                    tasks.append(asyncio.create_task(sendResponse(chatbot.fix_grammer_issue(data['message']),memory,'corrector')))
 
-                streamResponse = await chatbot.get_response(is_initial_message)
-                memory.add("assistant","",recording=False,user_recording=False)
-                await websocket.send_json({
-                        'index': len(memory),
-                        'user':'assistant',
-                        'message': ""
-                    })
-                async for chunk in streamResponse:
-                    msg=chunk.choices[0].delta.content or ""
-                    memory._memory[-1]['content']+=msg
-                    await websocket.send_json({
-                        'index': len(memory),
-                        'user':'assistant',
-                        'message': msg
-                    })
-                await websocket.send_json({
-                        'index': len(memory),
-                        'user':'assistant',
-                        'message': '',
-                        'end':True
-                    })
-                app_cache.last_sentence = ''
-                app_cache.sentences_counter = 0
-                app_cache.bot_recordings = list()
-                
+                tasks.append(asyncio.create_task(sendResponse(chatbot.get_response(is_initial_message),memory,'assistant')))
+                await asyncio.gather(*tasks)
+
             except Exception as e:
                 error_message = utils.get_error_message_from_exception(e)
                 await websocket.send_json({
